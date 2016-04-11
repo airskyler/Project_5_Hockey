@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+
+    <!-- importing bootstrap, css to use there function for this html file -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+          integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+
+<body>
+
+<!-- positioning the Flickr License Link to the left -->
+<div class="col-xs-6 col-xs-offset-1">
+
+
+<!-- The Link to a Flickr License for the usage of the credibility of the photo -->
+<a href="https://creativecommons.org/licenses/by-nc/2.0/legalcode">Flickr License Link
+</a>
+</div>
+
+<!--making the NHL hockey photo to the center and getting the photo from Flickr -->
+<div class="col-xs-6 col-xs-offset-3">
+    <a data-flickr-embed="true"
+       href="https://www.flickr.com/photos/clydeorama/6605486397/in/photolist-b4GQYv-7ytpRz-bdD5kv-dQxB7Z-5R6dQZ-c1dgpf-4BYW6o-dSXqoW-qasHbn-8WAH4c-qQs7hh-8D51QF-cME1Q3-egQgFk-gng23P-ii7hC2-ii717Y-6dDjkH-br5MaQ-ii7tFB-nZGLeT-9wPUra-jwVuyt-8N2CpR-8WAH4D-qyZXNw-r5HzC1-eYEdjt-8WAH5e-cdoHwu-7m2Zx7-7w2nSm-3Fzkx8-ii7e1d-jGGqDF-rjZ9uk-dpxvKy-8WwLd4-4HDFfs-8Xj9zR-9rnQUY-4o5WyD-9KpWnL-79uZub-kvEWV3-7upunX-i3cAwF-dqHZke-9yhbBZ-9sVoim"
+       title="Caps on the Ice Celebrate Backstrom&#x27;s 100th NHL Goal"><img
+            src="https://farm8.staticflickr.com/7019/6605486397_b69be5ac24_z.jpg" width="640" height="427"
+            alt="Caps on the Ice Celebrate Backstrom&#x27;s 100th NHL Goal">
+    </a>
+    <script async src="//embedr.flickr.com/assets/client-code.js" charset="utf-8"></script>
+</div>
+
+<!-- Contain the all the table, so that it fits inside the screen to display it -->
+<div class="container-fluid">
+
+    <!-- make more space at that bottom of the table -->
+    <div style="margin-bottom:50px;" class="row">
+
+        <!-- use left half of the screen to display this table -->
+        <div class="col-xs-6">
+
+            <table class="table table-responsive">
+
+                <thead>
+
+                <!-- creating table header -->
+                <th>
+                    Team Name
+                </th>
+                <th>
+                    Game Date
+                </th>
+                <th>
+                    Home/Away
+                </th>
+
+
+                </thead>
+                <tbody>
+                {% for game in games %}
+                <tr>    <!--creating table row -->
+
+
+                    <td>
+                        {{game.opponent}}
+                    </td>
+                    <td>
+                        {{game.date}}
+                    </td>
+                    <td>
+                        {{game.homeVSaway}}
+                    </td>
+                </tr>
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+        </div>
+        <div class="col-xs-6">
+            <table class="table table-responsive">
+
+                <thead>
+                <th>
+                    Item Name
+                </th>
+                <th>
+                    Price
+                </th>
+
+
+                </thead>
+                <tbody>
+                {% for item in items %}
+                <tr>
+
+
+                    <td>
+                        {{item.name}}
+                    </td>
+                    <td>
+                        $ {{item.price}}
+                    </td>
+
+                </tr>
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+    <!-- creating buttons with a URL link to display the different html file -->
+    <a class="btn btn-info" href="{% url 'GamePage' %}">
+
+        Enter New Game
+
+    </a>
+    <a class="btn btn-primary" href="{% url 'NewItem' %}">
+        Enter New Item
+    </a>
+    <a class="btn btn-warning" href="{% url 'SoldItem' %}">
+        Enter Sold Items
+    </a>
+
+
+    <div style="margin-top:50px;" class="row">
+        <div class="col-xs-6">
+
+
+            <table class="table table-responsive">
+
+                <thead>
+                <th>
+                    Item Name
+                </th>
+                <th>
+                    Opponent
+                </th>
+                <th>
+                    Game Date
+                </th>
+                <th>
+                    Home/Away
+                </th>
+                <th>
+                    Number Sold
+                </th>
+
+
+                </thead>
+                <tbody>
+                {% for SoldItem in SoldItems %}
+                <tr>
+
+
+                    <td>
+                        {{SoldItem.merch.name}}
+                    </td>
+                    <td>
+                        {{SoldItem.game.opponent}}
+                    </td>
+                    <td>
+                        {{SoldItem.game.date}}
+                    </td>
+                    <td>
+                        {{SoldItem.game.homeVSaway}}
+                    </td>
+                    <td>
+                        {{SoldItem.numberSold}}
+                    </td>
+                </tr>
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+        </div>
+        <form method="get" action="{{form_action}}">
+
+            <!-- Creating more buttons for Total Sales, Best Sales and Least Sales -->
+            <input type="submit" formaction="totalsale" value="Total Sales" class="btn btn-info">
+            <input type="submit" formaction="bestsale" value="Best Sales" class="btn btn-primary">
+            <input type="submit" formaction="leastsale" value="Least Sales" class="btn btn-danger">
+
+
+        </form>
+
+    </div>
+</div>
+
+
+<!-- It is more efficient to have this bootstrap, css function code here on the bottom
+rather than top of the html code to run the entire code better-->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
+        integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
+        crossorigin="anonymous"></script>
+</body>
+</html>

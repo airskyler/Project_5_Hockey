@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+          integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+<!-- creating a bigger button with pink color and button will change color to red,
+when the pointer hover over the button -->
+<style>
+    .btn {
+    padding: 11px 20px;
+    border: 0 none;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.btn-danger {
+    background: #F582F1;}
+
+</style>
+
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+
+<div class="container-fluid">
+
+    <!-- Using for loop to display, each of the least amount sold item,
+    and using "if not forloop.last" function to not display the "&" at the end of each least amount sold item name -->
+    <div style="margin-bottom:50px;" class="h2 row">
+        Least Sold item is{% for item in items %} {{item.merch.name}} {% if not forloop.last %} & {% endif %} {% endfor %}, with number sold amount of {{least_sales}}
+    </div>
+
+    <a class="btn btn-danger" href="{% url 'MainPage' %}">
+
+        Go Back to Main Page
+
+    </a>
+</div>
+
+
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
+        integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
+        crossorigin="anonymous"></script>
+</body>
+</html>
