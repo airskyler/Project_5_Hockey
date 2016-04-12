@@ -5,7 +5,7 @@ from django.shortcuts import redirect
 from django.db.models import FloatField, IntegerField
 from django.db.models import Sum, F, Max, Min
 
-
+# For this Project 5, I got help from my classmate Boyd and Mason from the Laerning Center for coding
 # These are the view that display each page,
 
 
