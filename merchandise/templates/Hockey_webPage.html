@@ -48,13 +48,24 @@
 
                 <!-- creating table header -->
                 <th>
-                    Team Name
+
                 </th>
                 <th>
-                    Game Date
+                    Team Name   <a href="{% url 'MainPage' %}?Q={{TORt}}"><i class="glyphicon glyphicon-sort">
+
+                </i></a>
                 </th>
                 <th>
-                    Home/Away
+                    Game Date   <a href="{% url 'MainPage' %}?Q={{GDORgd}}"><i class="glyphicon glyphicon-sort">
+
+                </i></a>
+
+                </th>
+                <th>
+                    Home/Away    <a href="{% url 'MainPage' %}?Q={{HAORha}}"><i class="glyphicon glyphicon-sort">
+
+                </i></a>
+
                 </th>
 
 
@@ -62,7 +73,9 @@
                 <tbody>
                 {% for game in games %}
                 <tr>    <!--creating table row -->
-
+                    <td>
+                        <input type="checkbox" name="gid" value="{{game.id}}">
+                    </td>
 
                     <td>
                         {{game.opponent}}
@@ -84,11 +97,18 @@
             <table class="table table-responsive">
 
                 <thead>
+                <th></th>
                 <th>
-                    Item Name
+                    Item Name    <a href="{% url 'MainPage' %}?Q={{INORin}}"> <i class="glyphicon glyphicon-sort">
+
+                </i></a>
+
                 </th>
                 <th>
-                    Price
+                    Price      <a href="{% url 'MainPage' %}?Q={{PORp}}"><i class="glyphicon glyphicon-sort">
+
+                </i></a>
+
                 </th>
 
 
@@ -96,7 +116,9 @@
                 <tbody>
                 {% for item in items %}
                 <tr>
-
+                    <td>
+                        <input type="checkbox" name="mid" value="{{item.id}}">
+                    </td>
 
                     <td>
                         {{item.name}}
@@ -128,6 +150,12 @@
         Enter Sold Items
     </a>
 
+    <div class="btn btn-danger" id="Delete_Button">
+        Delete
+
+    </div>
+
+    {% csrf_token %}
 
     <div style="margin-top:50px;" class="row">
         <div class="col-xs-6">
@@ -136,20 +164,36 @@
             <table class="table table-responsive">
 
                 <thead>
+                <th></th>
                 <th>
-                    Item Name
+                    Item Name    <a href="{% url 'MainPage' %}?Q={{IORi}}"><i class="glyphicon glyphicon-sort">
+
+                </i></a>
+
                 </th>
                 <th>
-                    Opponent
+                    Opponent     <a href="{% url 'MainPage' %}?Q={{OORo}}"><i class="glyphicon glyphicon-sort">
+
+                </i></a>
+
                 </th>
                 <th>
-                    Game Date
+                    Game Date    <a href="{% url 'MainPage' %}?Q={{GORg}}"><i class="glyphicon glyphicon-sort">
+
+                </i></a>
+
                 </th>
                 <th>
-                    Home/Away
+                    Home/Away    <a href="{% url 'MainPage' %}?Q={{HORh}}"><i class="glyphicon glyphicon-sort">
+
+                </i></a>
+
                 </th>
                 <th>
-                    Number Sold
+                    Number Sold   <a href="{% url 'MainPage' %}?Q={{NORn}}"><i class="glyphicon glyphicon-sort">
+
+                </i></a>
+
                 </th>
 
 
@@ -157,7 +201,9 @@
                 <tbody>
                 {% for SoldItem in SoldItems %}
                 <tr>
-
+                    <td>
+                        <input type="checkbox" name="sid" value="{{SoldItem.id}}">
+                    </td>
 
                     <td>
                         {{SoldItem.merch.name}}
@@ -189,6 +235,30 @@
             <input type="submit" formaction="leastsale" value="Least Sales" class="btn btn-danger">
 
 
+            <a class="btn btn-warning" href="{% url 'ItemDescription' %}">
+             Item Description
+            </a>
+
+
+
+            <div class="row" style="margin-top: 50px">
+
+                <div class="col-xs-1">
+                    Item Name
+                    {{form.ItemName}}
+                </div>
+
+                <div class="col-xs-1">
+                    Game Date
+                    {{form.GameDate}}
+                </div>
+
+                <div class="col-xs-1">
+                    Opponent
+                    {{form.Opponent}}
+                </div>
+
+            </div>
         </form>
 
     </div>
@@ -197,6 +267,39 @@
 
 <!-- It is more efficient to have this bootstrap, css function code here on the bottom
 rather than top of the html code to run the entire code better-->
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.1.1/js.cookie.min.js"></script>
+<script>
+    $(document).ready(function(){
+    //http://stackoverflow.com/questions/28620396/collect-all-the-values-from-checked-checkboxes-with-the-same-id-name
+    //This is based on the above link. Collect arrays of game, merch, solditem ids and post to /.
+        $('#Delete_Button').click(function(){
+            gids = [];
+            mids = [];
+            sids = [];
+
+            $('[name="gid"]:checked').each(function(e){
+                gids.push($(this).val());
+            });
+
+            $('[name="mid"]:checked').each(function(e){
+                mids.push($(this).val());
+            });
+
+            $('[name="sid"]:checked').each(function(e){
+                sids.push($(this).val());
+            });
+            console.log(mids);
+            $.post('/', data={'gid[]':gids, 'mid[]':mids, 'sid[]':sids, csrfmiddlewaretoken: Cookies.get('csrftoken')}).success(function(){location.reload()});
+
+
+
+        });
+    });
+
+</script>
+
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
         integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
         crossorigin="anonymous"></script>

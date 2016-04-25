@@ -30,4 +30,5 @@ urlpatterns = [
     url(r'^totalsale/',merch_views.TotalSalePage, name='TotalSale'),
     url(r'^bestsale/',merch_views.BestSalePage, name='BestSale'),
     url(r'^leastsale/',merch_views.LeastSoldPage, name='LeastSale'),
+    url(r'^itemdescription/',merch_views.ItemDescription, name='ItemDescription'),
 ]
