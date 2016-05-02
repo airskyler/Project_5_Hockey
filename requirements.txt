@@ -1,0 +1,5 @@
+# Django is a framework and coverage is a test coverage library
+
+
+Django==1.9.5
+coverage
