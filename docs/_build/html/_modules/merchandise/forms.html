@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>merchandise.forms &mdash; Hockey Inventory .1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Hockey Inventory .1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for merchandise.forms</h1><div class="highlight"><pre>
+<span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s1">&#39;Jessy&#39;</span>
+
+<span class="kn">from</span> <span class="nn">django</span> <span class="kn">import</span> <span class="n">forms</span>
+<span class="kn">from</span> <span class="nn">merchandise.models</span> <span class="kn">import</span> <span class="n">Merchandise</span><span class="p">,</span> <span class="n">Game</span><span class="p">,</span> <span class="n">SoldItem</span>
+
+
+
+<span class="c1"># Linking the Merchandise, Game and SoldItem tables to be formatted for HTML display</span>
+<span class="c1"># Must use Meta class for the ModelForm</span>
+<div class="viewcode-block" id="MerchandiseForm"><a class="viewcode-back" href="../../merchandise.html#merchandise.forms.MerchandiseForm">[docs]</a><span class="k">class</span> <span class="nc">MerchandiseForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">ModelForm</span><span class="p">):</span>
+<div class="viewcode-block" id="MerchandiseForm.Meta"><a class="viewcode-back" href="../../merchandise.html#merchandise.forms.MerchandiseForm.Meta">[docs]</a>    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Merchandise</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="s1">&#39;__all__&#39;</span>    <span class="c1"># using all field</span></div></div>
+
+
+<div class="viewcode-block" id="GameForm"><a class="viewcode-back" href="../../merchandise.html#merchandise.forms.GameForm">[docs]</a><span class="k">class</span> <span class="nc">GameForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">ModelForm</span><span class="p">):</span>
+<div class="viewcode-block" id="GameForm.Meta"><a class="viewcode-back" href="../../merchandise.html#merchandise.forms.GameForm.Meta">[docs]</a>    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span><span class="o">=</span> <span class="n">Game</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="s1">&#39;__all__&#39;</span></div></div>
+
+
+
+<div class="viewcode-block" id="SoldItemForm"><a class="viewcode-back" href="../../merchandise.html#merchandise.forms.SoldItemForm">[docs]</a><span class="k">class</span> <span class="nc">SoldItemForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">ModelForm</span><span class="p">):</span>
+<div class="viewcode-block" id="SoldItemForm.Meta"><a class="viewcode-back" href="../../merchandise.html#merchandise.forms.SoldItemForm.Meta">[docs]</a>    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">SoldItem</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="s1">&#39;__all__&#39;</span></div></div>
+
+
+
+<div class="viewcode-block" id="FilterForm"><a class="viewcode-back" href="../../merchandise.html#merchandise.forms.FilterForm">[docs]</a><span class="k">class</span> <span class="nc">FilterForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+
+    <span class="c1"># Creating a drop down list for either, Home or Away for the user choice to select</span>
+    <span class="n">homeVSaway</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">ChoiceField</span><span class="p">(</span><span class="n">choices</span><span class="o">=</span><span class="p">((</span><span class="s1">&#39;H&#39;</span><span class="p">,</span><span class="s1">&#39;Home&#39;</span><span class="p">),(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span><span class="s1">&#39;Away&#39;</span><span class="p">)),</span><span class="n">required</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span><span class="n">widget</span><span class="o">=</span><span class="n">forms</span><span class="o">.</span><span class="n">Select</span><span class="p">())</span>
+
+
+    <span class="c1"># Getting all the item name information for the drop down list from Merchandise table</span>
+    <span class="c1"># First drop down list will display as &#39;--------&#39; ....  which means nothing.</span>
+<div class="viewcode-block" id="FilterForm.get_items"><a class="viewcode-back" href="../../merchandise.html#merchandise.forms.FilterForm.get_items">[docs]</a>    <span class="k">def</span> <span class="nf">get_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">([(</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="s1">&#39;---------&#39;</span><span class="p">)]</span><span class="o">+</span><span class="p">[(</span><span class="n">name</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">name</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">Merchandise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)])</span></div>
+
+
+<div class="viewcode-block" id="FilterForm.get_dates"><a class="viewcode-back" href="../../merchandise.html#merchandise.forms.FilterForm.get_dates">[docs]</a>    <span class="k">def</span> <span class="nf">get_dates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">([(</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="s1">&#39;----------&#39;</span><span class="p">)]</span><span class="o">+</span><span class="p">[(</span><span class="n">date</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">date</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">date</span> <span class="ow">in</span> <span class="n">Game</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s1">&#39;date&#39;</span><span class="p">)])</span></div>
+
+
+<div class="viewcode-block" id="FilterForm.get_opponents"><a class="viewcode-back" href="../../merchandise.html#merchandise.forms.FilterForm.get_opponents">[docs]</a>    <span class="k">def</span> <span class="nf">get_opponents</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">([(</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="s1">&#39;----------&#39;</span><span class="p">)]</span><span class="o">+</span><span class="p">[(</span><span class="n">opponent</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">opponent</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">opponent</span> <span class="ow">in</span> <span class="n">Game</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s1">&#39;opponent&#39;</span><span class="p">)])</span></div>
+
+
+
+    <span class="c1"># Creating a drop down list for the data value of item, dates and opponents for the user selection</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FilterForm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>  <span class="c1"># Unpacking positional and key word arguments</span>
+
+        <span class="c1"># The code for &#39;required= False&#39; means you don&#39;t have to pick a anything from the drop down list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;ItemName&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">ChoiceField</span><span class="p">(</span><span class="n">choices</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_items</span><span class="p">(),</span><span class="n">required</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;GameDate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">ChoiceField</span><span class="p">(</span><span class="n">choices</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_dates</span><span class="p">(),</span><span class="n">required</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;Opponent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">ChoiceField</span><span class="p">(</span><span class="n">choices</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_opponents</span><span class="p">(),</span><span class="n">required</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span></div>
+
+
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Jessy Mullen.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

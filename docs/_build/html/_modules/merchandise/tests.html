@@ -1,0 +1,244 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>merchandise.tests &mdash; Hockey Inventory .1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Hockey Inventory .1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for merchandise.tests</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">django.test</span> <span class="kn">import</span> <span class="n">TestCase</span><span class="p">,</span> <span class="n">Client</span>
+<span class="kn">from</span> <span class="nn">merchandise.models</span> <span class="kn">import</span> <span class="n">Merchandise</span><span class="p">,</span> <span class="n">Game</span><span class="p">,</span> <span class="n">SoldItem</span>
+<span class="kn">from</span> <span class="nn">django.core.urlresolvers</span> <span class="kn">import</span> <span class="n">reverse</span>
+
+
+
+<div class="viewcode-block" id="TestMainPageView"><a class="viewcode-back" href="../../merchandise.html#merchandise.tests.TestMainPageView">[docs]</a><span class="k">class</span> <span class="nc">TestMainPageView</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="TestMainPageView.setUp"><a class="viewcode-back" href="../../merchandise.html#merchandise.tests.TestMainPageView.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<span class="c1"># creating objects here to use these objects for testing the method main page</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Red_wings</span> <span class="o">=</span> <span class="n">Game</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">opponent</span><span class="o">=</span><span class="s1">&#39;Red Wings&#39;</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="s1">&#39;2016-01-18&#39;</span><span class="p">,</span> <span class="n">homeVSaway</span><span class="o">=</span><span class="s1">&#39;H&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Canadiens</span> <span class="o">=</span> <span class="n">Game</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">opponent</span><span class="o">=</span><span class="s1">&#39;Canadiens&#39;</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="s1">&#39;2015-11-27&#39;</span><span class="p">,</span> <span class="n">homeVSaway</span><span class="o">=</span><span class="s1">&#39;A&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Oilers</span> <span class="o">=</span> <span class="n">Game</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">opponent</span><span class="o">=</span><span class="s1">&#39;Oilers&#39;</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="s1">&#39;2015-10-18&#39;</span><span class="p">,</span> <span class="n">homeVSaway</span><span class="o">=</span><span class="s1">&#39;A&#39;</span><span class="p">)</span>
+
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Jersey</span> <span class="o">=</span> <span class="n">Merchandise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Jersey&#39;</span><span class="p">,</span> <span class="n">price</span><span class="o">=</span><span class="mf">20.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Poster</span> <span class="o">=</span> <span class="n">Merchandise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Poster&#39;</span><span class="p">,</span> <span class="n">price</span><span class="o">=</span><span class="mf">10.5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Shot_Glass</span> <span class="o">=</span> <span class="n">Merchandise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Shot Glass&#39;</span><span class="p">,</span> <span class="n">price</span><span class="o">=</span> <span class="mf">7.77</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Cup</span> <span class="o">=</span> <span class="n">Merchandise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Cup&#39;</span><span class="p">,</span> <span class="n">price</span><span class="o">=</span><span class="mf">1.50</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Ice</span> <span class="o">=</span> <span class="n">Merchandise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Ice&#39;</span><span class="p">,</span> <span class="n">price</span><span class="o">=</span><span class="mf">5.07</span><span class="p">)</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">soldJersey</span> <span class="o">=</span> <span class="n">SoldItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">merch</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">Jersey</span><span class="p">,</span> <span class="n">game</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">Red_wings</span><span class="p">,</span> <span class="n">numberSold</span><span class="o">=</span><span class="mi">108</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">soldPoster</span> <span class="o">=</span> <span class="n">SoldItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">merch</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">Poster</span><span class="p">,</span> <span class="n">game</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">Canadiens</span><span class="p">,</span> <span class="n">numberSold</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">soldShotGlass</span> <span class="o">=</span> <span class="n">SoldItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">merch</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">Shot_Glass</span><span class="p">,</span> <span class="n">game</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">Oilers</span><span class="p">,</span> <span class="n">numberSold</span><span class="o">=</span><span class="mi">24</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">soldCup</span> <span class="o">=</span> <span class="n">SoldItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">merch</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">Cup</span><span class="p">,</span> <span class="n">game</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">Red_wings</span><span class="p">,</span> <span class="n">numberSold</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">soldIce</span> <span class="o">=</span> <span class="n">SoldItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">merch</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">Ice</span><span class="p">,</span> <span class="n">game</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">Oilers</span><span class="p">,</span> <span class="n">numberSold</span><span class="o">=</span><span class="mi">70</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TestMainPageView.test_NoParameters"><a class="viewcode-back" href="../../merchandise.html#merchandise.tests.TestMainPageView.test_NoParameters">[docs]</a>    <span class="k">def</span> <span class="nf">test_NoParameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span> <span class="c1"># helper class for making request thru Django web frame work for testing</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;MainPage&#39;</span><span class="p">))</span> <span class="c1"># get a response from a MainPage method</span>
+        <span class="n">games</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;games&#39;</span><span class="p">)</span> <span class="c1"># getting the context of game data</span>
+
+        <span class="c1"># testing that these team are in the game table</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Canadiens</span><span class="p">,</span> <span class="n">games</span><span class="p">,</span> <span class="s2">&quot;Canadiens are in the games in the context passed to the template&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Oilers</span><span class="p">,</span> <span class="n">games</span><span class="p">,</span> <span class="s2">&quot;Oilers are in the games in the context passed to the template&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Red_wings</span><span class="p">,</span> <span class="n">games</span><span class="p">,</span> <span class="s2">&quot;Red Wings are in the games in the context passed to the template&quot;</span><span class="p">)</span></div>
+
+        <span class="c1"># TODO test whether Merchandise objects and SoldItem objects are in the context.</span>
+
+
+
+<div class="viewcode-block" id="TestMainPageView.test_delete_each_type"><a class="viewcode-back" href="../../merchandise.html#merchandise.tests.TestMainPageView.test_delete_each_type">[docs]</a>    <span class="k">def</span> <span class="nf">test_delete_each_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test that each type of object Merchandise, Games, and SoldItems can be deleted by posting the array of</span>
+<span class="sd">        id&#39;s to MainPage&quot;&quot;&quot;</span>
+
+        <span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+
+        <span class="c1"># &#39;gid[]&#39; is game id array for deleting one or more games at same time</span>
+
+        <span class="c1"># Giving Canadians game id to the backend (server) to delete</span>
+        <span class="n">response1</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;MainPage&#39;</span><span class="p">),{</span><span class="s1">&#39;gid[]&#39;</span><span class="p">:[</span><span class="bp">self</span><span class="o">.</span><span class="n">Canadiens</span><span class="o">.</span><span class="n">id</span><span class="p">]})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response1</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="s2">&quot;Posting is working.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># the code of (reverse(&#39;MainPage&#39;)) is getting the URL path for the MainPage name</span>
+        <span class="c1"># &#39;client.get&#39; is a code fake URL request for testing</span>
+        <span class="n">response2</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;MainPage&#39;</span><span class="p">))</span>
+        <span class="n">games</span> <span class="o">=</span> <span class="n">response2</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;games&#39;</span><span class="p">)</span>
+
+        <span class="c1"># testing if there is 2 team left in the game table</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">games</span><span class="p">)</span><span class="o">==</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Now there are only two Games, we have deleted the Canadiens&quot;</span><span class="p">)</span>
+
+        <span class="c1"># testing No Canadians team are in the game table</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotIn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Canadiens</span><span class="p">,</span> <span class="n">games</span><span class="p">,</span> <span class="s2">&quot;No Canadiens&quot;</span><span class="p">)</span>
+
+
+        <span class="c1"># sending the id&#39;s for Ice and Jersey to the backend for deleting</span>
+        <span class="c1"># &#39;client.post&#39; code is sending the id&#39;s for the merchandise to the MainPage view, which deletes them</span>
+        <span class="c1"># from the merchandise table</span>
+        <span class="n">response3</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;MainPage&#39;</span><span class="p">),</span> <span class="p">{</span><span class="s1">&#39;mid[]&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Ice</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Jersey</span><span class="o">.</span><span class="n">id</span><span class="p">]})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response3</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="s2">&quot;Posting still working&quot;</span><span class="p">)</span>
+
+        <span class="n">response4</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;MainPage&#39;</span><span class="p">))</span>
+        <span class="n">merchandise</span> <span class="o">=</span> <span class="n">response4</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;items&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotIn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Ice</span><span class="p">,</span> <span class="n">merchandise</span><span class="p">,</span> <span class="s2">&quot;No more Ice.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotIn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Jersey</span><span class="p">,</span> <span class="n">merchandise</span><span class="p">,</span> <span class="s2">&quot;The jersey is gone.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Cup</span><span class="p">,</span> <span class="n">merchandise</span><span class="p">,</span> <span class="s2">&quot;The cup is still there.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># have to be careful since SoldItems depend on Games and Merchandise, we have gotten rid of some SoldItems</span>
+        <span class="c1"># From a quick scan only 2 SoldItems are left, we&#39;ll get rid of both of them</span>
+
+        <span class="n">preSoldItems</span> <span class="o">=</span> <span class="n">response4</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;SoldItems&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">preSoldItems</span><span class="p">),</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;There are only two SoldItems now&quot;</span><span class="p">)</span>
+
+        <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;MainPage&#39;</span><span class="p">),</span> <span class="p">{</span><span class="s1">&#39;sid[]&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">soldCup</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">soldShotGlass</span><span class="o">.</span><span class="n">id</span><span class="p">]})</span>
+        <span class="n">postSoldItems</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;MainPage&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;SoldItems&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">postSoldItems</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;No SoldItems are left.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestMainPageView.test_sorting_games"><a class="viewcode-back" href="../../merchandise.html#merchandise.tests.TestMainPageView.test_sorting_games">[docs]</a>    <span class="k">def</span> <span class="nf">test_sorting_games</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Sorting by each of the url parameters T:t (opponent or -opponent), GD:gd (date or -date)... see views.py</span>
+
+
+        <span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+
+        <span class="c1"># &#39;Q&#39; is a URL parameter for querying</span>
+        <span class="c1"># everything that comes after the &#39;?&#39; (Question mark) is a URL parameter</span>
+
+        <span class="c1"># testing if the opponent will sort in ascending order</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;MainPage&#39;</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;?Q=T&#39;</span><span class="p">)</span>
+        <span class="n">games</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;games&#39;</span><span class="p">)</span>
+
+        <span class="c1"># checking if the team order is in alphabetical</span>
+        <span class="n">the_correct_order</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Canadiens</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Oilers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Red_wings</span><span class="p">]</span>
+
+
+        <span class="c1"># g is for games. c is for the_correct_order</span>
+        <span class="c1"># checking each of the game is in correct order</span>
+        <span class="k">for</span> <span class="n">g</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">games</span><span class="p">,</span> <span class="n">the_correct_order</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">g</span><span class="p">,</span><span class="n">c</span><span class="p">,</span> <span class="s2">&quot;Each Game is in the correct alphabetical order by opponent name&quot;</span><span class="p">)</span>
+
+        <span class="c1"># testing if the opponent will sort in descending order</span>
+        <span class="n">desc_games</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;MainPage&#39;</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;?Q=t&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;games&#39;</span><span class="p">)</span>
+        <span class="c1"># Now it is descending</span>
+
+        <span class="c1"># reversing the opponent order</span>
+        <span class="n">the_correct_order</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">g</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">desc_games</span><span class="p">,</span> <span class="n">the_correct_order</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="s2">&quot;Each game is in the correct desc alphabetical order by opponent name.&quot;</span><span class="p">)</span>
+
+
+        <span class="c1"># testing the game dates for each team by ascending date order</span>
+        <span class="n">games_by_date</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;MainPage&#39;</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;?Q=GD&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;games&#39;</span><span class="p">)</span>
+        <span class="n">the_correct_order</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Oilers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Canadiens</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Red_wings</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">g</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">games_by_date</span><span class="p">,</span> <span class="n">the_correct_order</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="s2">&quot;Each game is in the correct order by date. Earliest to latest&quot;</span><span class="p">)</span>
+
+
+        <span class="c1"># testing the game date for each team by descending order</span>
+        <span class="n">games_by_date_latest_to_earliest</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;MainPage&#39;</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;?Q=gd&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;games&#39;</span><span class="p">)</span>
+        <span class="n">the_correct_order</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">g</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">games_by_date_latest_to_earliest</span><span class="p">,</span> <span class="n">the_correct_order</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="s2">&quot;Each game is in latest to earliest order by date.&quot;</span><span class="p">)</span></div>
+
+
+        <span class="c1"># TODO write homeVSaway test. first that the Aways are first then the Homes</span>
+
+    <span class="c1"># TODO write more ordering/sorting tests</span>
+
+
+
+<div class="viewcode-block" id="TestMainPageView.test_fuzz"><a class="viewcode-back" href="../../merchandise.html#merchandise.tests.TestMainPageView.test_fuzz">[docs]</a>    <span class="k">def</span> <span class="nf">test_fuzz</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;This tests that the MainPage view will only look for certain parameters and if they aren&#39;t there or are</span>
+<span class="sd">        replaced by something else, it won&#39;t error.&quot;&quot;&quot;</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+
+        <span class="c1"># giving the server a bad URL parameter</span>
+        <span class="c1"># but it doesn&#39;t have a server error , so it is design well</span>
+        <span class="n">malicious_junk</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;zzz&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;UUUUi&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">mal</span> <span class="ow">in</span> <span class="n">malicious_junk</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s2">&quot;MainPage&quot;</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;?Q=&#39;</span><span class="o">+</span><span class="n">mal</span><span class="p">)</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="s2">&quot;Can&#39;t cause the server to error.&quot;</span><span class="p">)</span></div></div>
+
+
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Jessy Mullen.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -12,24 +12,41 @@ from django.db.models import Sum, F, Max, Min
 
 # Displaying all three tables in one main page
 def MainPage(request):
+    """
+    Show all three database table and allow for sorting by ascending or descending order, for date sorting it sorts by
+    date. Price sort by numbers and Team name is sorted by Alphabetically.
+
+     See URL.py and check the code of 'url(r'^$',merch_views.MainPage, name='MainPage'), '
+
+     See test.py  for class called 'class TestMainPageView(TestCase):' and method the test with this class.
+     It has a method to test sorting, deleting all object types, test malicious user input
+
+
+    :param request HTTP request:
+    :return rendered template with context:
+    """
     if request.method == "GET":
+
+        # 'T' is made to use for ascending sort order
+        # 't' is made to use for descending sort order
+        # Every objects have a ascending and descending URL parameter
+
         game_query_dict = {'T': 'opponent', 't': '-opponent', 'GD': 'date', 'gd': '-date', 'HA': 'homeVSaway', 'ha': '-homeVSaway'}
         merchandise_query_dict = {'IN': 'name', 'in': '-name', 'P': 'price', 'p': '-price'}
         soldItem_query_dict = {'I': 'merch__name', 'i':'-merch__name', 'O': 'game__opponent', 'o': '-game__opponent', 'G': 'game__date',
                                'g': '-game__date', 'H': 'game__homeVSaway', 'h': '-game__homeVSaway', 'N': 'numberSold', 'n': '-numberSold'}
 
 
+        # Setting the starting sorting order to ascending for every fields of the database
         TORt, GDORgd, HAORha, INORin, PORp, IORi, OORo, GORg, HORh, NORn = 'T', 'GD', 'HA', 'IN', 'P','I', 'O', 'G', 'H', 'N'
 
         Games = Game.objects.all()
         ItemsForSale = Merchandise.objects.all()
         ItemSold = SoldItem.objects.all()
 
+        # Looking for 'Q' for the URL query parameter
         Query = request.GET.get("Q")
         if Query:
-
-
-
 
             game_limiter = game_query_dict.get(Query)
 
@@ -38,7 +55,10 @@ def MainPage(request):
                 GDORgd = {'GD': 'gd', 'gd': 'GD'}
                 HAORha = {'HA': 'ha', 'ha': 'HA'}
 
+                # order by either ascending or descending for opponent,date and homeVSaway
                 Games = Games.order_by(game_limiter)
+
+                # Sort by opposite, next time you click the up or down sort button
                 TORt = TORt.get(Query) or 'T'
                 GDORgd = GDORgd.get(Query) or 'GD'
                 HAORha = HAORha.get(Query) or 'HA'
@@ -75,13 +95,17 @@ def MainPage(request):
 
 
 
+        # template out the HTML and return it
         return render(request, 'Hockey_webPage.html',{'games': Games, 'items': ItemsForSale,
         'SoldItems': ItemSold, 'form': FilterForm, 'TORt': TORt, 'GDORgd': GDORgd, 'HAORha': HAORha, 'INORin': INORin, 'PORp': PORp,
         'IORi': IORi, 'OORo': OORo, 'GORg': GORg, 'HORh': HORh, 'NORn': NORn})
+
+    # Deleting the game, merchandise and sold item data from database by using the database id
     elif request.method == 'POST':
         game_ids = [int(i) for i in request.POST.getlist('gid[]')]
         merch_ids = [int(i) for i in request.POST.getlist('mid[]')]
         sold_ids = [int(i) for i in request.POST.getlist('sid[]')]
+
         if game_ids:
             Game.objects.filter(id__in=game_ids).delete()
         if merch_ids:
@@ -90,6 +114,8 @@ def MainPage(request):
             SoldItem.objects.filter(id__in=sold_ids).delete()
 
         return HttpResponse('Success!')
+
+
 
 # Display TotalSalePage
 # Getting total sales by filtering either Item Name, Game Date or Opponent.
@@ -131,6 +157,14 @@ def TotalSalePage(request):
 # Display BestSalePage
 # Getting the best sales item by filter choice of Item Name, Game Date and Opponent
 def BestSalePage(request):
+
+    """
+    Getting the filter attributes from the drop down list of the item name, game date and game opponent.
+    And from those attributes, calculate the best sale item one with most sold item
+
+    :param request HTTP request:
+    :return rendered HTML template:
+    """
     form=FilterForm(request.GET)
     if form.is_valid():
 
@@ -155,8 +189,17 @@ def BestSalePage(request):
 
 def LeastSoldPage(request):
 
-     form=FilterForm(request.GET)
-     if form.is_valid():
+    """
+    Getting the filter attributes from the drop down list of the item name, game date and game opponent.
+    And from those attributes, calculate the least sold item one with least sold item
+
+    :param request HTTP request:
+    :return rendered HTML template:
+    """
+
+
+    form=FilterForm(request.GET)
+    if form.is_valid():
 
         filter_attributes = (('merch__name', 'ItemName'), ('game__date', 'GameDate'), ('game__opponent', 'Opponent'))
         resulting_form_attributes = [f for f in filter_attributes if request.GET.get(f[1])]
@@ -168,35 +211,46 @@ def LeastSoldPage(request):
 
         return render(request, 'Least_Sold_webPage.html', {'least_sales':LeastSoldItem,'items':SoldItem.objects.filter(numberSold=LeastSoldItem, **filter_dict)})
 
-     else:
+    else:
          return render(request, 'Hockey_webPage.html',{'games': Game.objects.all(), 'items': Merchandise.objects.all(),
         'SoldItems': SoldItem.objects.all(), 'form': form})
 
 
 
 
-def ItemDescription(request):
-
-    return render(request, 'Item_Description_Page.html')
-
-
-
 
 def GamePage(request):
+
+    """
+    New game form page uses Form_webPage.html template and GameForm model form
+
+    :param request HTTP request:
+    :return rendered HTML template or redirect:
+    """
+
     if request.method == 'POST':
         form = GameForm(request.POST)
-        if form.is_valid():
+        if form.is_valid(): # If the user input data is valid then save the data to database
             form.save()
-            return redirect(to='/')
+            return redirect(to='/')  # Redirect to the MainPage
         else:
-            return render(request, 'Form_webPage.html',{'form': form})
+            return render(request, 'Form_webPage.html',{'form': form}) # Re-render the template with form now with errors
 
     else:
+
+        # If the request is a GET request, then return a form in the render template
         return render(request, 'Form_webPage.html',{'form': GameForm,'action':'/newgame/'})
 
 
 
 def SoldItemPage(request):
+
+    """
+    Sold Item form page uses Form_webPage.html template and SoldItemForm model form
+
+    :param request HTTP request:
+    :return rendered HTML template or redirect:
+    """
     if request.method == 'POST':
         form = SoldItemForm(request.POST)
         if form.is_valid():
@@ -213,11 +267,18 @@ def SoldItemPage(request):
 
 
 def NewItemPage(request):
-    if request.method == 'POST': # if I clicked the submit button
+
+    """
+    New item form page uses Form_webPage.html template and MerchandiseForm model form
+
+    :param request HTTP request:
+    :return rendered HTML template or redirect:
+    """
+    if request.method == 'POST':  # if I clicked the submit button
         form = MerchandiseForm(request.POST)  # look at the form and see if the data type  is valid for to save it
         if form.is_valid():
             form.save()
-            return redirect(to='/') # go to home page (local host 8000)
+            return redirect(to='/')  # go to home page (local host 8000)
         else:
             return render(request, 'Form_webPage.html',{'form': form}) # display the error on the form when the data type is invalid
 

@@ -1,0 +1,380 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>merchandise.views &mdash; Hockey Inventory .1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="Hockey Inventory .1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for merchandise.views</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render</span>
+<span class="kn">from</span> <span class="nn">merchandise.forms</span> <span class="kn">import</span> <span class="n">MerchandiseForm</span><span class="p">,</span> <span class="n">GameForm</span><span class="p">,</span> <span class="n">SoldItemForm</span><span class="p">,</span> <span class="n">FilterForm</span>
+<span class="kn">from</span> <span class="nn">merchandise.models</span> <span class="kn">import</span> <span class="n">Game</span><span class="p">,</span> <span class="n">Merchandise</span><span class="p">,</span> <span class="n">SoldItem</span>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">HttpResponse</span>
+<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">redirect</span>
+<span class="kn">from</span> <span class="nn">django.db.models</span> <span class="kn">import</span> <span class="n">FloatField</span><span class="p">,</span> <span class="n">IntegerField</span>
+<span class="kn">from</span> <span class="nn">django.db.models</span> <span class="kn">import</span> <span class="n">Sum</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">Max</span><span class="p">,</span> <span class="n">Min</span>
+
+<span class="c1"># For this Project 5, I got help from my classmate Boyd and Mason from the Learning Center for coding</span>
+<span class="c1"># These are the view that display each page,</span>
+
+
+<span class="c1"># Displaying all three tables in one main page</span>
+<div class="viewcode-block" id="MainPage"><a class="viewcode-back" href="../../merchandise.html#merchandise.views.MainPage">[docs]</a><span class="k">def</span> <span class="nf">MainPage</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Show all three database table and allow for sorting by ascending or descending order, for date sorting it sorts by</span>
+<span class="sd">    date. Price sort by numbers and Team name is sorted by Alphabetically.</span>
+
+<span class="sd">     See URL.py and check the code of &#39;url(r&#39;^$&#39;,merch_views.MainPage, name=&#39;MainPage&#39;), &#39;</span>
+
+<span class="sd">     See test.py  for class called &#39;class TestMainPageView(TestCase):&#39; and method the test with this class.</span>
+<span class="sd">     It has a method to test sorting, deleting all object types, test malicious user input</span>
+
+
+<span class="sd">    :param request HTTP request:</span>
+<span class="sd">    :return rendered template with context:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;GET&quot;</span><span class="p">:</span>
+
+        <span class="c1"># &#39;T&#39; is made to use for ascending sort order</span>
+        <span class="c1"># &#39;t&#39; is made to use for descending sort order</span>
+        <span class="c1"># Every objects have a ascending and descending URL parameter</span>
+
+        <span class="n">game_query_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;T&#39;</span><span class="p">:</span> <span class="s1">&#39;opponent&#39;</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span><span class="p">:</span> <span class="s1">&#39;-opponent&#39;</span><span class="p">,</span> <span class="s1">&#39;GD&#39;</span><span class="p">:</span> <span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="s1">&#39;gd&#39;</span><span class="p">:</span> <span class="s1">&#39;-date&#39;</span><span class="p">,</span> <span class="s1">&#39;HA&#39;</span><span class="p">:</span> <span class="s1">&#39;homeVSaway&#39;</span><span class="p">,</span> <span class="s1">&#39;ha&#39;</span><span class="p">:</span> <span class="s1">&#39;-homeVSaway&#39;</span><span class="p">}</span>
+        <span class="n">merchandise_query_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;IN&#39;</span><span class="p">:</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;in&#39;</span><span class="p">:</span> <span class="s1">&#39;-name&#39;</span><span class="p">,</span> <span class="s1">&#39;P&#39;</span><span class="p">:</span> <span class="s1">&#39;price&#39;</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="s1">&#39;-price&#39;</span><span class="p">}</span>
+        <span class="n">soldItem_query_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;I&#39;</span><span class="p">:</span> <span class="s1">&#39;merch__name&#39;</span><span class="p">,</span> <span class="s1">&#39;i&#39;</span><span class="p">:</span><span class="s1">&#39;-merch__name&#39;</span><span class="p">,</span> <span class="s1">&#39;O&#39;</span><span class="p">:</span> <span class="s1">&#39;game__opponent&#39;</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">:</span> <span class="s1">&#39;-game__opponent&#39;</span><span class="p">,</span> <span class="s1">&#39;G&#39;</span><span class="p">:</span> <span class="s1">&#39;game__date&#39;</span><span class="p">,</span>
+                               <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="s1">&#39;-game__date&#39;</span><span class="p">,</span> <span class="s1">&#39;H&#39;</span><span class="p">:</span> <span class="s1">&#39;game__homeVSaway&#39;</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">:</span> <span class="s1">&#39;-game__homeVSaway&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="s1">&#39;numberSold&#39;</span><span class="p">,</span> <span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="s1">&#39;-numberSold&#39;</span><span class="p">}</span>
+
+
+        <span class="c1"># Setting the starting sorting order to ascending for every fields of the database</span>
+        <span class="n">TORt</span><span class="p">,</span> <span class="n">GDORgd</span><span class="p">,</span> <span class="n">HAORha</span><span class="p">,</span> <span class="n">INORin</span><span class="p">,</span> <span class="n">PORp</span><span class="p">,</span> <span class="n">IORi</span><span class="p">,</span> <span class="n">OORo</span><span class="p">,</span> <span class="n">GORg</span><span class="p">,</span> <span class="n">HORh</span><span class="p">,</span> <span class="n">NORn</span> <span class="o">=</span> <span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="s1">&#39;GD&#39;</span><span class="p">,</span> <span class="s1">&#39;HA&#39;</span><span class="p">,</span> <span class="s1">&#39;IN&#39;</span><span class="p">,</span> <span class="s1">&#39;P&#39;</span><span class="p">,</span><span class="s1">&#39;I&#39;</span><span class="p">,</span> <span class="s1">&#39;O&#39;</span><span class="p">,</span> <span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="s1">&#39;H&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span>
+
+        <span class="n">Games</span> <span class="o">=</span> <span class="n">Game</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">ItemsForSale</span> <span class="o">=</span> <span class="n">Merchandise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">ItemSold</span> <span class="o">=</span> <span class="n">SoldItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+        <span class="c1"># Looking for &#39;Q&#39; for the URL query parameter</span>
+        <span class="n">Query</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Q&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">Query</span><span class="p">:</span>
+
+            <span class="n">game_limiter</span> <span class="o">=</span> <span class="n">game_query_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">Query</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">game_limiter</span><span class="p">:</span>
+                <span class="n">TORt</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;t&#39;</span><span class="p">:</span><span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">:</span><span class="s1">&#39;t&#39;</span><span class="p">}</span>
+                <span class="n">GDORgd</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;GD&#39;</span><span class="p">:</span> <span class="s1">&#39;gd&#39;</span><span class="p">,</span> <span class="s1">&#39;gd&#39;</span><span class="p">:</span> <span class="s1">&#39;GD&#39;</span><span class="p">}</span>
+                <span class="n">HAORha</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;HA&#39;</span><span class="p">:</span> <span class="s1">&#39;ha&#39;</span><span class="p">,</span> <span class="s1">&#39;ha&#39;</span><span class="p">:</span> <span class="s1">&#39;HA&#39;</span><span class="p">}</span>
+
+                <span class="c1"># order by either ascending or descending for opponent,date and homeVSaway</span>
+                <span class="n">Games</span> <span class="o">=</span> <span class="n">Games</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">game_limiter</span><span class="p">)</span>
+
+                <span class="c1"># Sort by opposite, next time you click the up or down sort button</span>
+                <span class="n">TORt</span> <span class="o">=</span> <span class="n">TORt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">Query</span><span class="p">)</span> <span class="ow">or</span> <span class="s1">&#39;T&#39;</span>
+                <span class="n">GDORgd</span> <span class="o">=</span> <span class="n">GDORgd</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">Query</span><span class="p">)</span> <span class="ow">or</span> <span class="s1">&#39;GD&#39;</span>
+                <span class="n">HAORha</span> <span class="o">=</span> <span class="n">HAORha</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">Query</span><span class="p">)</span> <span class="ow">or</span> <span class="s1">&#39;HA&#39;</span>
+
+
+            <span class="n">merchandise_limiter</span> <span class="o">=</span> <span class="n">merchandise_query_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">Query</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">merchandise_limiter</span><span class="p">:</span>
+
+                <span class="n">INORin</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;IN&#39;</span><span class="p">:</span> <span class="s1">&#39;in&#39;</span><span class="p">,</span> <span class="s1">&#39;in&#39;</span><span class="p">:</span> <span class="s1">&#39;IN&#39;</span><span class="p">}</span>
+                <span class="n">PORp</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;P&#39;</span><span class="p">:</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="s1">&#39;P&#39;</span><span class="p">}</span>
+
+                <span class="n">ItemsForSale</span> <span class="o">=</span> <span class="n">ItemsForSale</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">merchandise_limiter</span><span class="p">)</span>
+                <span class="n">INORin</span> <span class="o">=</span> <span class="n">INORin</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">Query</span><span class="p">)</span> <span class="ow">or</span> <span class="s1">&#39;IN&#39;</span>
+                <span class="n">PORp</span> <span class="o">=</span> <span class="n">PORp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">Query</span><span class="p">)</span> <span class="ow">or</span> <span class="s1">&#39;P&#39;</span>
+
+
+            <span class="n">soldItem_limiter</span> <span class="o">=</span> <span class="n">soldItem_query_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">Query</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">soldItem_limiter</span><span class="p">:</span>
+
+                <span class="n">IORi</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;I&#39;</span><span class="p">:</span> <span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="s1">&#39;i&#39;</span><span class="p">:</span> <span class="s1">&#39;I&#39;</span><span class="p">}</span>
+                <span class="n">OORo</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;O&#39;</span><span class="p">:</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">:</span> <span class="s1">&#39;O&#39;</span><span class="p">}</span>
+                <span class="n">GORg</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;G&#39;</span><span class="p">:</span> <span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="s1">&#39;G&#39;</span><span class="p">}</span>
+                <span class="n">HORh</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;H&#39;</span><span class="p">:</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">:</span> <span class="s1">&#39;H&#39;</span><span class="p">}</span>
+                <span class="n">NORn</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="s1">&#39;n&#39;</span><span class="p">,</span> <span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="s1">&#39;N&#39;</span><span class="p">}</span>
+
+                <span class="n">ItemSold</span> <span class="o">=</span> <span class="n">ItemSold</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">soldItem_limiter</span><span class="p">)</span>
+                <span class="n">IORi</span> <span class="o">=</span> <span class="n">IORi</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">Query</span><span class="p">)</span> <span class="ow">or</span> <span class="s1">&#39;I&#39;</span>
+                <span class="n">OORo</span> <span class="o">=</span> <span class="n">OORo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">Query</span><span class="p">)</span> <span class="ow">or</span> <span class="s1">&#39;O&#39;</span>
+                <span class="n">GORg</span> <span class="o">=</span> <span class="n">GORg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">Query</span><span class="p">)</span> <span class="ow">or</span> <span class="s1">&#39;G&#39;</span>
+                <span class="n">HORh</span> <span class="o">=</span> <span class="n">HORh</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">Query</span><span class="p">)</span> <span class="ow">or</span> <span class="s1">&#39;H&#39;</span>
+                <span class="n">NORn</span> <span class="o">=</span> <span class="n">NORn</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">Query</span><span class="p">)</span> <span class="ow">or</span> <span class="s1">&#39;N&#39;</span>
+
+
+
+        <span class="c1"># template out the HTML and return it</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;Hockey_webPage.html&#39;</span><span class="p">,{</span><span class="s1">&#39;games&#39;</span><span class="p">:</span> <span class="n">Games</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="n">ItemsForSale</span><span class="p">,</span>
+        <span class="s1">&#39;SoldItems&#39;</span><span class="p">:</span> <span class="n">ItemSold</span><span class="p">,</span> <span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">FilterForm</span><span class="p">,</span> <span class="s1">&#39;TORt&#39;</span><span class="p">:</span> <span class="n">TORt</span><span class="p">,</span> <span class="s1">&#39;GDORgd&#39;</span><span class="p">:</span> <span class="n">GDORgd</span><span class="p">,</span> <span class="s1">&#39;HAORha&#39;</span><span class="p">:</span> <span class="n">HAORha</span><span class="p">,</span> <span class="s1">&#39;INORin&#39;</span><span class="p">:</span> <span class="n">INORin</span><span class="p">,</span> <span class="s1">&#39;PORp&#39;</span><span class="p">:</span> <span class="n">PORp</span><span class="p">,</span>
+        <span class="s1">&#39;IORi&#39;</span><span class="p">:</span> <span class="n">IORi</span><span class="p">,</span> <span class="s1">&#39;OORo&#39;</span><span class="p">:</span> <span class="n">OORo</span><span class="p">,</span> <span class="s1">&#39;GORg&#39;</span><span class="p">:</span> <span class="n">GORg</span><span class="p">,</span> <span class="s1">&#39;HORh&#39;</span><span class="p">:</span> <span class="n">HORh</span><span class="p">,</span> <span class="s1">&#39;NORn&#39;</span><span class="p">:</span> <span class="n">NORn</span><span class="p">})</span>
+
+    <span class="c1"># Deleting the game, merchandise and sold item data from database by using the database id</span>
+    <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">game_ids</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;gid[]&#39;</span><span class="p">)]</span>
+        <span class="n">merch_ids</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;mid[]&#39;</span><span class="p">)]</span>
+        <span class="n">sold_ids</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;sid[]&#39;</span><span class="p">)]</span>
+
+        <span class="k">if</span> <span class="n">game_ids</span><span class="p">:</span>
+            <span class="n">Game</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">id__in</span><span class="o">=</span><span class="n">game_ids</span><span class="p">)</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">merch_ids</span><span class="p">:</span>
+            <span class="n">Merchandise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">id__in</span><span class="o">=</span><span class="n">merch_ids</span><span class="p">)</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">sold_ids</span><span class="p">:</span>
+            <span class="n">SoldItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">id__in</span><span class="o">=</span><span class="n">sold_ids</span><span class="p">)</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s1">&#39;Success!&#39;</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># Display TotalSalePage</span>
+<span class="c1"># Getting total sales by filtering either Item Name, Game Date or Opponent.</span>
+<div class="viewcode-block" id="TotalSalePage"><a class="viewcode-back" href="../../merchandise.html#merchandise.views.TotalSalePage">[docs]</a><span class="k">def</span> <span class="nf">TotalSalePage</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="c1"># Getting the user data from the drop down list and check to see if the data is valid in the FilterForm</span>
+    <span class="n">form</span><span class="o">=</span><span class="n">FilterForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+
+        <span class="c1"># Wrapping how the ORM  refer to the field name and how form refers to field name</span>
+        <span class="n">filter_attributes</span> <span class="o">=</span> <span class="p">((</span><span class="s1">&#39;merch__name&#39;</span><span class="p">,</span><span class="s1">&#39;ItemName&#39;</span><span class="p">),(</span> <span class="s1">&#39;game__date&#39;</span><span class="p">,</span> <span class="s1">&#39;GameDate&#39;</span><span class="p">),</span> <span class="p">(</span> <span class="s1">&#39;game__opponent&#39;</span><span class="p">,</span> <span class="s1">&#39;Opponent&#39;</span><span class="p">))</span>
+
+        <span class="c1"># Only get the fields that has values in the request.GET dictionary</span>
+        <span class="n">resulting_form_attributes</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">filter_attributes</span> <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+
+        <span class="c1"># Creating empty dictionary for accumulating ORM fields with form values</span>
+        <span class="n">filter_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+
+        <span class="k">for</span> <span class="n">rfa</span> <span class="ow">in</span> <span class="n">resulting_form_attributes</span><span class="p">:</span>
+
+            <span class="c1"># It is getting the value of the select field and setting that as a value with key being the ORM field</span>
+            <span class="n">filter_dict</span><span class="p">[</span><span class="n">rfa</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">rfa</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+            <span class="c1"># Unpack the filter dict and filter on the values</span>
+            <span class="c1"># If total sales is none... display as zero</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;Total_Sale_webPage.html&#39;</span><span class="p">,{</span><span class="s2">&quot;total_sales&quot;</span><span class="p">:</span> <span class="n">SoldItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="o">**</span><span class="n">filter_dict</span><span class="p">)</span><span class="o">.</span><span class="n">aggregate</span>
+                           <span class="p">(</span><span class="n">total_sales</span><span class="o">=</span><span class="n">Sum</span><span class="p">(</span><span class="n">F</span><span class="p">(</span><span class="s1">&#39;merch__price&#39;</span><span class="p">)</span><span class="o">*</span><span class="n">F</span><span class="p">(</span><span class="s1">&#39;numberSold&#39;</span><span class="p">),</span><span class="n">output_field</span><span class="o">=</span><span class="n">FloatField</span><span class="p">()))</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;total_sales&quot;</span><span class="p">)</span><span class="ow">or</span> <span class="mi">0</span><span class="p">})</span>
+
+    <span class="c1"># Display the main web page</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;Hockey_webPage.html&#39;</span><span class="p">,{</span><span class="s1">&#39;games&#39;</span><span class="p">:</span> <span class="n">Game</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="n">Merchandise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span>
+        <span class="s1">&#39;SoldItems&#39;</span><span class="p">:</span> <span class="n">SoldItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span> <span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">})</span></div>
+
+
+
+
+
+<span class="c1"># Display BestSalePage</span>
+<span class="c1"># Getting the best sales item by filter choice of Item Name, Game Date and Opponent</span>
+<div class="viewcode-block" id="BestSalePage"><a class="viewcode-back" href="../../merchandise.html#merchandise.views.BestSalePage">[docs]</a><span class="k">def</span> <span class="nf">BestSalePage</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Getting the filter attributes from the drop down list of the item name, game date and game opponent.</span>
+<span class="sd">    And from those attributes, calculate the best sale item one with most sold item</span>
+
+<span class="sd">    :param request HTTP request:</span>
+<span class="sd">    :return rendered HTML template:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">form</span><span class="o">=</span><span class="n">FilterForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+
+        <span class="n">filter_attributes</span> <span class="o">=</span> <span class="p">((</span><span class="s1">&#39;merch__name&#39;</span><span class="p">,</span> <span class="s1">&#39;ItemName&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;game__date&#39;</span><span class="p">,</span> <span class="s1">&#39;GameDate&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;game__opponent&#39;</span><span class="p">,</span> <span class="s1">&#39;Opponent&#39;</span><span class="p">))</span>
+        <span class="n">resulting_form_attributes</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">filter_attributes</span> <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+        <span class="n">filter_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">rfa</span> <span class="ow">in</span> <span class="n">resulting_form_attributes</span><span class="p">:</span>
+            <span class="n">filter_dict</span><span class="p">[</span><span class="n">rfa</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">rfa</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="n">BestSoldItem</span> <span class="o">=</span> <span class="n">SoldItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="o">**</span><span class="n">filter_dict</span><span class="p">)</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">best_sales</span><span class="o">=</span><span class="n">Max</span><span class="p">(</span><span class="n">F</span><span class="p">(</span><span class="s1">&#39;numberSold&#39;</span><span class="p">),</span><span class="n">output_field</span><span class="o">=</span><span class="n">IntegerField</span><span class="p">()))</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;best_sales&#39;</span><span class="p">)</span><span class="ow">or</span> <span class="mi">0</span>
+
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;Best_Item_webPage.html&#39;</span><span class="p">,{</span><span class="s1">&#39;best_sales&#39;</span><span class="p">:</span><span class="n">BestSoldItem</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span><span class="n">SoldItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">numberSold</span><span class="o">=</span><span class="n">BestSoldItem</span><span class="p">,</span> <span class="o">**</span><span class="n">filter_dict</span><span class="p">)})</span>
+
+
+    <span class="k">else</span><span class="p">:</span>
+         <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;Hockey_webPage.html&#39;</span><span class="p">,{</span><span class="s1">&#39;games&#39;</span><span class="p">:</span> <span class="n">Game</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="n">Merchandise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span>
+        <span class="s1">&#39;SoldItems&#39;</span><span class="p">:</span> <span class="n">SoldItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span> <span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">})</span></div>
+
+
+
+
+
+<div class="viewcode-block" id="LeastSoldPage"><a class="viewcode-back" href="../../merchandise.html#merchandise.views.LeastSoldPage">[docs]</a><span class="k">def</span> <span class="nf">LeastSoldPage</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Getting the filter attributes from the drop down list of the item name, game date and game opponent.</span>
+<span class="sd">    And from those attributes, calculate the least sold item one with least sold item</span>
+
+<span class="sd">    :param request HTTP request:</span>
+<span class="sd">    :return rendered HTML template:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+
+    <span class="n">form</span><span class="o">=</span><span class="n">FilterForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+
+        <span class="n">filter_attributes</span> <span class="o">=</span> <span class="p">((</span><span class="s1">&#39;merch__name&#39;</span><span class="p">,</span> <span class="s1">&#39;ItemName&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;game__date&#39;</span><span class="p">,</span> <span class="s1">&#39;GameDate&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;game__opponent&#39;</span><span class="p">,</span> <span class="s1">&#39;Opponent&#39;</span><span class="p">))</span>
+        <span class="n">resulting_form_attributes</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">filter_attributes</span> <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+        <span class="n">filter_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">rfa</span> <span class="ow">in</span> <span class="n">resulting_form_attributes</span><span class="p">:</span>
+            <span class="n">filter_dict</span><span class="p">[</span><span class="n">rfa</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">rfa</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="n">LeastSoldItem</span> <span class="o">=</span> <span class="n">SoldItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="o">**</span><span class="n">filter_dict</span><span class="p">)</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">least_sales</span><span class="o">=</span><span class="n">Min</span><span class="p">(</span><span class="n">F</span><span class="p">(</span><span class="s1">&#39;numberSold&#39;</span><span class="p">),</span><span class="n">output_field</span><span class="o">=</span><span class="n">IntegerField</span><span class="p">()))</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;least_sales&#39;</span><span class="p">)</span><span class="ow">or</span> <span class="mi">0</span>
+
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;Least_Sold_webPage.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;least_sales&#39;</span><span class="p">:</span><span class="n">LeastSoldItem</span><span class="p">,</span><span class="s1">&#39;items&#39;</span><span class="p">:</span><span class="n">SoldItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">numberSold</span><span class="o">=</span><span class="n">LeastSoldItem</span><span class="p">,</span> <span class="o">**</span><span class="n">filter_dict</span><span class="p">)})</span>
+
+    <span class="k">else</span><span class="p">:</span>
+         <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;Hockey_webPage.html&#39;</span><span class="p">,{</span><span class="s1">&#39;games&#39;</span><span class="p">:</span> <span class="n">Game</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="n">Merchandise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span>
+        <span class="s1">&#39;SoldItems&#39;</span><span class="p">:</span> <span class="n">SoldItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span> <span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">})</span></div>
+
+
+
+
+
+<div class="viewcode-block" id="GamePage"><a class="viewcode-back" href="../../merchandise.html#merchandise.views.GamePage">[docs]</a><span class="k">def</span> <span class="nf">GamePage</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    New game form page uses Form_webPage.html template and GameForm model form</span>
+
+<span class="sd">    :param request HTTP request:</span>
+<span class="sd">    :return rendered HTML template or redirect:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">GameForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span> <span class="c1"># If the user input data is valid then save the data to database</span>
+            <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">to</span><span class="o">=</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>  <span class="c1"># Redirect to the MainPage</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;Form_webPage.html&#39;</span><span class="p">,{</span><span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">})</span> <span class="c1"># Re-render the template with form now with errors</span>
+
+    <span class="k">else</span><span class="p">:</span>
+
+        <span class="c1"># If the request is a GET request, then return a form in the render template</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;Form_webPage.html&#39;</span><span class="p">,{</span><span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">GameForm</span><span class="p">,</span><span class="s1">&#39;action&#39;</span><span class="p">:</span><span class="s1">&#39;/newgame/&#39;</span><span class="p">})</span></div>
+
+
+
+<div class="viewcode-block" id="SoldItemPage"><a class="viewcode-back" href="../../merchandise.html#merchandise.views.SoldItemPage">[docs]</a><span class="k">def</span> <span class="nf">SoldItemPage</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sold Item form page uses Form_webPage.html template and SoldItemForm model form</span>
+
+<span class="sd">    :param request HTTP request:</span>
+<span class="sd">    :return rendered HTML template or redirect:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">SoldItemForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">to</span><span class="o">=</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;Form_webPage.html&#39;</span><span class="p">,{</span><span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">})</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;Form_webPage.html&#39;</span><span class="p">,{</span><span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">SoldItemForm</span><span class="p">,</span><span class="s1">&#39;action&#39;</span><span class="p">:</span><span class="s1">&#39;/solditem/&#39;</span><span class="p">})</span></div>
+
+
+
+
+
+<div class="viewcode-block" id="NewItemPage"><a class="viewcode-back" href="../../merchandise.html#merchandise.views.NewItemPage">[docs]</a><span class="k">def</span> <span class="nf">NewItemPage</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    New item form page uses Form_webPage.html template and MerchandiseForm model form</span>
+
+<span class="sd">    :param request HTTP request:</span>
+<span class="sd">    :return rendered HTML template or redirect:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>  <span class="c1"># if I clicked the submit button</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">MerchandiseForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>  <span class="c1"># look at the form and see if the data type  is valid for to save it</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">to</span><span class="o">=</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>  <span class="c1"># go to home page (local host 8000)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;Form_webPage.html&#39;</span><span class="p">,{</span><span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">})</span> <span class="c1"># display the error on the form when the data type is invalid</span>
+
+
+<span class="c1"># if you click the link for a new item on the home page, display this form (/newitem/)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;Form_webPage.html&#39;</span><span class="p">,{</span><span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">MerchandiseForm</span><span class="p">,</span><span class="s1">&#39;action&#39;</span><span class="p">:</span><span class="s1">&#39;/newitem/&#39;</span><span class="p">})</span></div>
+
+
+
+
+
+
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Jessy Mullen.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

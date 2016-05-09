@@ -5,9 +5,11 @@ from merchandise.models import Merchandise, Game, SoldItem
 
 
 
-# Linking the Merchandise, Game and SoldItem tables to be formatted for HTML display
-# Must use Meta class for the ModelForm
+
 class MerchandiseForm(forms.ModelForm):
+
+    """Linking the Merchandise, Game and SoldItem tables to be formatted for HTML display,
+    Must use Meta class for the ModelForm"""
     class Meta:
         model = Merchandise
         fields = '__all__'    # using all field
@@ -33,9 +35,9 @@ class FilterForm(forms.Form):
     homeVSaway = forms.ChoiceField(choices=(('H','Home'),('A','Away')),required=False,widget=forms.Select())
 
 
-    # Getting all the item name information for the drop down list from Merchandise table
-    # First drop down list will display as '--------' ....  which means nothing.
     def get_items(self):
+        """Getting all the item name information for the drop down list from Merchandise table
+        First drop down list will display as '--------' ....  which means nothing."""
         return tuple([('','---------')]+[(name[0], name[0]) for name in Merchandise.objects.values_list('name')])
 
 
@@ -48,8 +50,9 @@ class FilterForm(forms.Form):
 
 
 
-    # Creating a drop down list for the data value of item, dates and opponents for the user selection
     def __init__(self, *args, **kwargs):
+        """Creating a drop down list for the data value of item, dates and opponents for the user selection"""
+
         super(FilterForm, self).__init__(*args, **kwargs)  # Unpacking positional and key word arguments
 
         # The code for 'required= False' means you don't have to pick a anything from the drop down list
